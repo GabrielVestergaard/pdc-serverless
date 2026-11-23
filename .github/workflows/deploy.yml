@@ -1,0 +1,67 @@
+name: Deploy PDC
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # lets the job get an OIDC token to sign in to AWS (no stored keys)
+  contents: read
+
+concurrency:
+  group: deploy-pdc
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: 1. Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Lint CloudFormation template
+        run: pip install --quiet cfn-lint && cfn-lint template.yaml
+      - name: Check menu data and build script
+        run: python3 scripts/build_items.py pdc-store-items https://example.com /tmp/ddb
+      - name: Check website JavaScript
+        run: node --check site/app.js
+
+  deploy:
+    name: 2. Deploy to AWS
+    needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      site_url: ${{ steps.deploy.outputs.site_url }}
+      api: ${{ steps.deploy.outputs.api }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read deploy settings
+        run: |
+          source deploy.config
+          echo "AWS_REGION=$REGION" >> "$GITHUB_ENV"
+          echo "DEPLOY_ROLE=arn:aws:iam::${AWS_ACCOUNT_ID}:role/pdc-github-deploy-role" >> "$GITHUB_ENV"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Deploy stack, data, and site
+        id: deploy
+        run: bash deploy.sh
+
+  smoke-test:
+    name: 3. Smoke test
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: API returns 6 items for each store
+        run: |
+          for store in provo kyoto; do
+            count=$(curl -fsS "${{ needs.deploy.outputs.api }}/items?store=$store" | jq '.count')
+            echo "$store: $count items"
+            test "$count" -ge 6
+          done
+      - name: Website loads
+        run: curl -fsS -o /dev/null -w "HTTP %{http_code}\n" "${{ needs.deploy.outputs.site_url }}/"

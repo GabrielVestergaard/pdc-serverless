@@ -1,0 +1,312 @@
+{
+  "stores": [
+    {
+      "storeId": "provo",
+      "name": "Provo",
+      "city": "Provo, Utah",
+      "address": "University Avenue, Provo, UT 84604",
+      "timezone": "America/Denver",
+      "openHour": 6,
+      "closeHour": 22,
+      "currency": "USD",
+      "accent": "#d6336c",
+      "tagline": "Mountain mornings start with something glazed.",
+      "blurb": "Our original shop at the foot of the Wasatch. Classic American donuts, made from scratch every morning.",
+      "bannerImage": "stores/provo.png"
+    },
+    {
+      "storeId": "kyoto",
+      "name": "Kyoto",
+      "city": "Kyoto, Japan",
+      "address": "Higashiyama-ku, Kyoto 605-0073, Japan",
+      "timezone": "Asia/Tokyo",
+      "openHour": 7,
+      "closeHour": 21,
+      "currency": "JPY",
+      "accent": "#5f8a3a",
+      "tagline": "Tea-house flavors, freshly fried.",
+      "blurb": "A few steps from Yasaka Shrine. Light donuts glazed with matcha, hojicha, sakura, and yuzu.",
+      "bannerImage": "stores/kyoto.png"
+    }
+  ],
+  "items": [
+    {
+      "storeId": "provo",
+      "itemId": "glazed",
+      "name": "Original Glazed",
+      "price": 1.49,
+      "category": "Classic",
+      "calories": 240,
+      "description": "Light, airy yeast donut dipped in a thin vanilla glaze while it's still warm.",
+      "tags": [
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Hot cocoa",
+      "featured": false,
+      "sortOrder": 1,
+      "accent": "#fbe3c4",
+      "image": "donuts/glazed.png"
+    },
+    {
+      "storeId": "provo",
+      "itemId": "beehive-honey",
+      "name": "Beehive Honey",
+      "price": 2.29,
+      "category": "Local favorite",
+      "calories": 280,
+      "description": "Utah wildflower honey glaze with a honeycomb pattern. A nod to the Beehive State.",
+      "tags": [
+        "Store exclusive",
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Cold brew",
+      "featured": true,
+      "sortOrder": 2,
+      "accent": "#fde8a6",
+      "image": "donuts/beehive-honey.png"
+    },
+    {
+      "storeId": "provo",
+      "itemId": "maple-bar",
+      "name": "Maple Bar",
+      "price": 2.29,
+      "category": "Iced",
+      "calories": 330,
+      "description": "A pillowy long john topped with thick real-maple icing.",
+      "tags": [
+        "Store exclusive"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Hot chocolate",
+      "featured": false,
+      "sortOrder": 3,
+      "accent": "#f3d2b1",
+      "image": "donuts/maple-bar.png"
+    },
+    {
+      "storeId": "provo",
+      "itemId": "boston-cream",
+      "name": "Boston Cream",
+      "price": 2.49,
+      "category": "Filled",
+      "calories": 310,
+      "description": "Vanilla bean custard filling under a glossy dark-chocolate top.",
+      "tags": [],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Whole milk",
+      "featured": false,
+      "sortOrder": 4,
+      "accent": "#ead7c8",
+      "image": "donuts/boston-cream.png"
+    },
+    {
+      "storeId": "provo",
+      "itemId": "raspberry-filled",
+      "name": "Raspberry Filled",
+      "price": 2.29,
+      "category": "Filled",
+      "calories": 290,
+      "description": "Powdered-sugar shell packed with bright raspberry jam.",
+      "tags": [
+        "Seasonal"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Lemonade",
+      "featured": false,
+      "sortOrder": 5,
+      "accent": "#f9d3de",
+      "image": "donuts/raspberry-filled.png"
+    },
+    {
+      "storeId": "provo",
+      "itemId": "rainbow-sprinkle",
+      "name": "Rainbow Sprinkle",
+      "price": 1.99,
+      "category": "Iced",
+      "calories": 270,
+      "description": "Chocolate icing covered in rainbow sprinkles. Built for birthdays and Saturdays.",
+      "tags": [
+        "Kids' pick"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Chocolate milk",
+      "featured": false,
+      "sortOrder": 6,
+      "accent": "#d9ecf7",
+      "image": "donuts/rainbow-sprinkle.png"
+    },
+    {
+      "storeId": "kyoto",
+      "itemId": "glazed",
+      "name": "Original Glazed",
+      "price": 210,
+      "category": "Classic",
+      "calories": 240,
+      "description": "Light, airy yeast donut dipped in a thin vanilla glaze while it's still warm.",
+      "tags": [
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Hot genmaicha",
+      "featured": false,
+      "sortOrder": 1,
+      "accent": "#fbe3c4",
+      "image": "donuts/glazed.png"
+    },
+    {
+      "storeId": "kyoto",
+      "itemId": "uji-matcha",
+      "name": "Uji Matcha",
+      "price": 320,
+      "category": "Tea house",
+      "calories": 260,
+      "description": "Stone-ground Uji matcha glaze with a white-chocolate drizzle.",
+      "tags": [
+        "Store exclusive",
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Iced sencha",
+      "featured": true,
+      "sortOrder": 2,
+      "accent": "#dcebc8",
+      "image": "donuts/uji-matcha.png"
+    },
+    {
+      "storeId": "kyoto",
+      "itemId": "hojicha-cream",
+      "name": "Hojicha Cream",
+      "price": 340,
+      "category": "Filled",
+      "calories": 300,
+      "description": "Roasted green tea cream filling under a toasty hojicha glaze.",
+      "tags": [
+        "Store exclusive"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Hojicha latte",
+      "featured": false,
+      "sortOrder": 3,
+      "accent": "#ecd9c4",
+      "image": "donuts/hojicha-cream.png"
+    },
+    {
+      "storeId": "kyoto",
+      "itemId": "black-sesame",
+      "name": "Black Sesame",
+      "price": 300,
+      "category": "Tea house",
+      "calories": 270,
+      "description": "Toasted black sesame icing finished with crunchy white sesame seeds.",
+      "tags": [
+        "Store exclusive"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy",
+        "Sesame"
+      ],
+      "pairsWith": "Hot genmaicha",
+      "featured": false,
+      "sortOrder": 4,
+      "accent": "#e3e1dc",
+      "image": "donuts/black-sesame.png"
+    },
+    {
+      "storeId": "kyoto",
+      "itemId": "sakura",
+      "name": "Sakura",
+      "price": 330,
+      "category": "Seasonal",
+      "calories": 250,
+      "description": "Cherry-blossom glaze topped with candied petals. Spring all year.",
+      "tags": [
+        "Seasonal",
+        "Store exclusive"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Sakura tea",
+      "featured": false,
+      "sortOrder": 5,
+      "accent": "#fbdce5",
+      "image": "donuts/sakura.png"
+    },
+    {
+      "storeId": "kyoto",
+      "itemId": "yuzu-citrus",
+      "name": "Yuzu Citrus",
+      "price": 310,
+      "category": "Seasonal",
+      "calories": 250,
+      "description": "Bright yuzu glaze with candied zest. Tart, sweet, and fresh.",
+      "tags": [
+        "Store exclusive"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Sparkling water",
+      "featured": false,
+      "sortOrder": 6,
+      "accent": "#fbf0b8",
+      "image": "donuts/yuzu-citrus.png"
+    }
+  ]
+}

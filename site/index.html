@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paradise Donut Co.</title>
+  <meta name="description" content="Fresh donuts from Paradise Donut Co. Pick a shop, browse today's menu, and build a box.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23d99a55'/%3E%3Ccircle cx='32' cy='32' r='24' fill='%23ff4f8b'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-store="provo">
+  <a class="skip" href="#menu">Skip to the menu</a>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Paradise Donut Co. home">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="28" fill="#d99a55"/>
+        <circle cx="32" cy="32" r="23" fill="var(--accent)"/>
+        <circle cx="32" cy="32" r="9" fill="var(--paper)"/>
+      </svg>
+      <span>Paradise Donut Co.</span>
+    </a>
+
+    <nav class="store-switch" aria-label="Choose a shop" id="store-switch"></nav>
+
+    <button class="box-button" type="button" id="open-box" aria-haspopup="dialog">
+      <span>Your box</span>
+      <span class="box-count" id="box-count" aria-live="polite">0</span>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="store-name">
+      <div class="hero-text">
+        <p class="status" id="store-status"><span class="dot"></span><span>Checking hours</span></p>
+        <h1 id="store-name" class="store-name">Paradise</h1>
+        <p class="tagline" id="store-tagline">Loading today's menu.</p>
+        <p class="blurb" id="store-blurb"></p>
+        <dl class="facts">
+          <div><dt>Address</dt><dd id="store-address">&nbsp;</dd></div>
+          <div><dt>Hours</dt><dd id="store-hours">&nbsp;</dd></div>
+        </dl>
+        <a class="cta" href="#menu">See the menu</a>
+      </div>
+      <figure class="hero-art">
+        <img id="store-banner" alt="" width="1600" height="900">
+        <button type="button" class="pick" id="todays-pick" hidden>
+          <img alt="" id="pick-img" width="120" height="120">
+          <span>
+            <small>Today's pick</small>
+            <strong id="pick-name"></strong>
+            <span id="pick-price"></span>
+          </span>
+        </button>
+      </figure>
+    </section>
+
+    <section class="menu" id="menu" aria-labelledby="menu-title">
+      <div class="menu-head">
+        <h2 id="menu-title">Today's menu</h2>
+        <p id="menu-count" class="muted" aria-live="polite"></p>
+      </div>
+
+      <div class="toolbar">
+        <label class="search">
+          <span class="visually-hidden">Search donuts</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input type="search" id="search" placeholder="Search flavors, like matcha or jam" autocomplete="off">
+        </label>
+        <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+        <label class="sort">
+          <span>Sort by</span>
+          <select id="sort">
+            <option value="featured">Our order</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="calories">Calories: lowest first</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid" id="grid" aria-busy="true"></div>
+      <div class="notice" id="notice" hidden></div>
+    </section>
+  </main>
+
+  <!-- Box tray: fills one slot per donut -->
+  <aside class="tray" aria-label="Your box">
+    <div class="tray-slots" id="tray-slots" aria-hidden="true"></div>
+    <div class="tray-info">
+      <strong id="tray-title">Your box is empty</strong>
+      <span id="tray-sub" class="muted">Add up to 12 donuts. A full dozen saves 10%.</span>
+    </div>
+    <button type="button" class="tray-review" id="tray-review" disabled>Review box</button>
+  </aside>
+
+  <footer class="footer">
+    <p>Paradise Donut Co. prototype. Menus load live from our serverless API on AWS.</p>
+    <p class="muted" id="latency"></p>
+  </footer>
+
+  <!-- Donut details -->
+  <dialog class="sheet detail" id="detail" aria-labelledby="detail-name">
+    <form method="dialog" class="close-row"><button class="icon-btn" aria-label="Close">&times;</button></form>
+    <div class="detail-body">
+      <div class="detail-art" id="detail-art"><img id="detail-img" alt="" width="420" height="420"></div>
+      <div class="detail-text">
+        <div class="tags" id="detail-tags"></div>
+        <h2 id="detail-name"></h2>
+        <p class="detail-price" id="detail-price"></p>
+        <p id="detail-desc"></p>
+        <dl class="detail-facts">
+          <div><dt>Calories</dt><dd id="detail-cal"></dd></div>
+          <div><dt>Goes well with</dt><dd id="detail-pair"></dd></div>
+          <div><dt>Contains</dt><dd id="detail-allergens"></dd></div>
+        </dl>
+        <div class="add-row">
+          <div class="stepper" role="group" aria-label="Quantity">
+            <button type="button" id="qty-minus" aria-label="Fewer">&minus;</button>
+            <output id="qty" aria-live="polite">1</output>
+            <button type="button" id="qty-plus" aria-label="More">+</button>
+          </div>
+          <button type="button" class="primary" id="detail-add">Add to box</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Box review -->
+  <dialog class="sheet drawer" id="box" aria-labelledby="box-title">
+    <div class="drawer-head">
+      <h2 id="box-title">Your box</h2>
+      <form method="dialog"><button class="icon-btn" aria-label="Close">&times;</button></form>
+    </div>
+    <ul class="box-list" id="box-list"></ul>
+    <div class="box-summary">
+      <p><span>Subtotal</span><span id="box-subtotal"></span></p>
+      <p id="box-discount-row" hidden><span>Dozen discount (10%)</span><span id="box-discount"></span></p>
+      <p class="total"><span>Total</span><span id="box-total"></span></p>
+      <p class="muted" id="box-hint"></p>
+      <button type="button" class="primary wide" id="checkout">Check out</button>
+      <button type="button" class="link" id="clear-box">Empty the box</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  Paradise Donut Company serverless prototype. S3 + CloudFront (custom domain) for the site,
+  API Gateway HTTP API + Python Lambda + DynamoDB for the menu, plus a GitHub Actions deploy role.
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: donuts.lincolnlyons.com
+    Description: Custom domain for the site (only used when CertificateArn is set)
+  CertificateArn:
+    Type: String
+    Default: ""
+    Description: ACM certificate ARN in us-east-1 for DomainName. Leave blank to use the CloudFront domain only.
+  GitHubRepo:
+    Type: String
+    Description: GitHub repo allowed to deploy, as owner/name (e.g. gabe/pdc-serverless)
+  CreateGitHubOIDCProvider:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: Set to false if this AWS account already has the token.actions.githubusercontent.com provider
+  AlertEmail:
+    Type: String
+    Default: ""
+    Description: Optional email for Lambda error alarms (you must confirm the SNS email)
+
+Conditions:
+  HasCert: !Not [!Equals [!Ref CertificateArn, ""]]
+  CreateOIDC: !Equals [!Ref CreateGitHubOIDCProvider, "true"]
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+
+Resources:
+  # ---------- Website: private S3 bucket served only through CloudFront ----------
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "pdc-serverless-site-${AWS::AccountId}"
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  SiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "pdc-site-oac-${AWS::AccountId}"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  SiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: Paradise Donut Company site
+        Enabled: true
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        PriceClass: PriceClass_100
+        Aliases: !If [HasCert, [!Ref DomainName], !Ref AWS::NoValue]
+        ViewerCertificate: !If
+          - HasCert
+          - AcmCertificateArn: !Ref CertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
+        Origins:
+          - Id: s3-site
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOAC.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: s3-site
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6          # Managed-CachingOptimized
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03 # Managed-SecurityHeadersPolicy
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${SiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}"
+
+  # ---------- Data: one table, one partition per store ----------
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: pdc-store-items
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - AttributeName: storeId
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: storeId
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+  # ---------- Compute: Python Lambda ----------
+  ItemsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/pdc-get-store-items
+      RetentionInDays: 14
+
+  ItemsFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: pdc-get-store-items-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: QueryItemsTableOnly
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: dynamodb:Query
+                Resource: !GetAtt ItemsTable.Arn
+
+  ItemsFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: ItemsFunctionLogGroup
+    Properties:
+      FunctionName: pdc-get-store-items
+      Description: Returns one store's profile and menu with a DynamoDB Query
+      Runtime: python3.13
+      Handler: index.handler
+      Role: !GetAtt ItemsFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref ItemsTable
+      Code:
+        ZipFile: |
+          # pdc-get-store-items: returns one store's profile + menu using a DynamoDB Query (not a Scan)
+          import json
+          import os
+          from decimal import Decimal
+
+          import boto3
+          from boto3.dynamodb.conditions import Key
+
+          TABLE = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
+          HEADERS = {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Cache-Control": "public, max-age=30",
+          }
+
+
+          def plain(value):
+              # DynamoDB numbers come back as Decimal; turn them into normal JSON numbers
+              if isinstance(value, Decimal):
+                  return int(value) if value % 1 == 0 else float(value)
+              raise TypeError(f"Cannot serialize {type(value)}")
+
+
+          def respond(status, body):
+              return {"statusCode": status, "headers": HEADERS, "body": json.dumps(body, default=plain)}
+
+
+          def handler(event, context):
+              params = event.get("queryStringParameters") or {}
+              store = (params.get("store") or "").strip().lower()
+              if not store:
+                  return respond(400, {"error": "Add ?store=provo or ?store=kyoto"})
+
+              try:
+                  # One Query reads the whole store partition: its PROFILE row and every ITEM# row
+                  result = TABLE.query(KeyConditionExpression=Key("storeId").eq(store))
+              except Exception as err:
+                  print(json.dumps({"level": "ERROR", "store": store, "error": str(err)}))
+                  return respond(500, {"error": "Could not load the menu"})
+
+              rows = result["Items"]
+              profile = next((r for r in rows if r["sk"] == "PROFILE"), None)
+              items = sorted((r for r in rows if r["sk"].startswith("ITEM#")), key=lambda r: r.get("sortOrder", 99))
+              if profile is None:
+                  return respond(404, {"error": f"No store named '{store}'"})
+
+              print(json.dumps({"level": "INFO", "store": store, "items": len(items)}))
+              return respond(200, {"store": store, "profile": profile, "count": len(items), "items": items})
+
+  # ---------- API: HTTP API with throttling and access logs ----------
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: pdc-items-api
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins: ["*"]
+        AllowMethods: [GET, OPTIONS]
+        AllowHeaders: [content-type]
+        MaxAge: 3600
+
+  ItemsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt ItemsFunction.Arn
+      PayloadFormatVersion: "2.0"
+
+  ItemsRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: GET /items
+      Target: !Sub "integrations/${ItemsIntegration}"
+
+  ApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/apigateway/pdc-items-api
+      RetentionInDays: 14
+
+  ApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: $default
+      AutoDeploy: true
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 100
+        ThrottlingRateLimit: 50
+      AccessLogSettings:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        Format: '{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","route":"$context.routeKey","status":"$context.status","latencyMs":"$context.responseLatency"}'
+
+  ApiInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ItemsFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*"
+
+  # ---------- Monitoring: alarm on any Lambda error ----------
+  AlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: pdc-alerts
+
+  AlertSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertEmail
+    Properties:
+      TopicArn: !Ref AlertTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+
+  ItemsFunctionErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: pdc-get-store-items-errors
+      AlarmDescription: The menu Lambda returned an error in the last 5 minutes
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ItemsFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref AlertTopic]
+
+  # ---------- Pipeline: GitHub Actions signs in with OIDC (no stored keys) ----------
+  GitHubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDC
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+      ThumbprintList: [6938fd4d98bab03faadb97b34396831e3780aea1]
+
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: pdc-github-deploy-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !If
+                - CreateOIDC
+                - !Ref GitHubOIDCProvider
+                - !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubRepo}:ref:refs/heads/main"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/PowerUserAccess
+      Policies:
+        - PolicyName: ManageThisStacksIamOnly
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: iam:*
+                Resource:
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:role/pdc-*"
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+
+Outputs:
+  SiteURL:
+    Value: !If [HasCert, !Sub "https://${DomainName}", !Sub "https://${SiteDistribution.DomainName}"]
+  CloudFrontDomain:
+    Description: Point the DomainName CNAME at this value
+    Value: !GetAtt SiteDistribution.DomainName
+  DistributionId:
+    Value: !Ref SiteDistribution
+  ApiEndpoint:
+    Value: !GetAtt HttpApi.ApiEndpoint
+  BucketName:
+    Value: !Ref SiteBucket
+  TableName:
+    Value: !Ref ItemsTable
+  DeployRoleArn:
+    Value: !GetAtt GitHubDeployRole.Arn
