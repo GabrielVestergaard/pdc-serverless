@@ -56,10 +56,11 @@ Everything is already written in this repo: `template.yaml` (all infrastructure,
 
 - **AWS account:** Gabe's, region **us-east-1**. **Repo:** Gabe's GitHub, `pdc-serverless`, with Lincoln (`linklyns`) as a collaborator. The deploy role only trusts pushes to **main** of the repo named in `deploy.config`.
 - **Resource names** (the diagram must match): stack `pdc-serverless`, bucket `pdc-serverless-site-<accountId>`, CloudFront distribution in front of the bucket, table `pdc-store-items`, Lambda `pdc-get-store-items` (role `pdc-get-store-items-role`), HTTP API `pdc-items-api` with route `GET /items`, alarm `pdc-get-store-items-errors`, SNS topic `pdc-alerts`, pipeline role `pdc-github-deploy-role`.
-- **DynamoDB keys (single-table design):** partition key `storeId` (`provo`, `kyoto`) and sort key `sk`. Each store has one `PROFILE` row (name, address, hours, currency, banner) and 6 `ITEM#<itemId>` rows. Original Glazed is stored once per store (P3 requirement).
-- **API response** (`GET /items?store=kyoto`): `{ store, profile, count, items[] }`. Item fields: `itemId, name, price, category, calories, description, tags[], allergens[], pairsWith, featured, sortOrder, accent, imageUrl`. The website depends on these names.
-- **Images:** `site/images/donuts/<itemId>.png` (11 files) and `site/images/stores/<storeId>.png` (2 files). Filenames must match `data/items.json`. The repo ships with placeholder PNGs, so the site works before the final images exist.
+- **DynamoDB keys (single-table design):** partition key `storeId` (`provo`, `honolulu`, `sydney`) and sort key `sk`. Each store has one `PROFILE` row (name, address, hours, time zone, currency, theme colors, banner) and 6 `ITEM#<itemId>` rows, for 21 rows total. Paradise Glazed is stored once for each of the 3 stores, and four other donuts are sold at 2 stores each (P3 requirement).
+- **API response** (`GET /items?store=honolulu`): `{ store, profile, count, items[] }`. Item fields: `itemId, name, price, category, calories, description, tags[], allergens[], pairsWith, featured, sortOrder, accent, imageUrl`. The website depends on these names.
+- **Images:** `site/images/donuts/<itemId>.png` (12 final photos with transparent backgrounds) and `site/images/stores/<storeId>.png` (3 banners; placeholders until Lincoln replaces them). Filenames must match `data/items.json`.
 - **Live URL:** `https://donuts.lincolnlyons.com/?store=provo`. Until the domain is live, use the CloudFront URL that `deploy.sh` prints.
+- **Menu changes:** edit `data/items.json`. Every deploy loads it into DynamoDB and deletes rows that are no longer in the file, so removed stores or donuts disappear cleanly.
 - **Deploying:** the first deploy runs from CloudShell (`bash deploy.sh`). After the pipeline works, deploy by pushing to `main`. Don't run CloudShell deploys and pipeline deploys at the same time.
 - **Production changes = priced items.** Everything on the Feature 6 list must also appear in the Feature 7 estimate (P5).
 
@@ -68,6 +69,7 @@ Everything is already written in this repo: `template.yaml` (all infrastructure,
 | When | From → To | What |
 |---|---|---|
 | G1 | Gabe → Lincoln | GitHub collaborator invite and the repo URL |
+| Now | Lincoln → Gabe | Pull request `honolulu-sydney-menu` (3 stores + final donut photos) to merge |
 | G2 | Gabe → Lincoln | The certificate validation CNAME (name + value) |
 | G3 | Gabe → Lincoln | The `Done.` block from `deploy.sh` (CloudFront domain, API URL, site URL) |
 | L2 | Lincoln → Gabe | "Both DNS records are in" |
@@ -88,6 +90,14 @@ Everything is already written in this repo: `template.yaml` (all infrastructure,
 P1 intro · P2–3 requirements · P3 optional features · P4 rubric + deliverables · P4–5 tips · P5 FAQ (diagram, production changes, DynamoDB keys) · P6 FAQ (price estimate, keep site live) · S1–2 Who/URL/rubric · S3 Features 1–6 · S4 Features 7–9 + optional.
 
 ---
+
+## Update, Nov 23: three stores (merge Lincoln's pull request)
+
+The menu changed from Provo + Kyoto to **Provo, Honolulu, and Sydney**, using 12 final donut photos. Lincoln pushes the changes on a branch called `honolulu-sydney-menu` and opens a pull request. Merge it when you're **not** in the middle of a CloudShell deploy:
+- **GitHub → Pull requests → (the PR) → Merge pull request.** Merging pushes to `main`, which starts the pipeline.
+- If the pipeline isn't working yet, deploy by hand: `cd ~/pdc-serverless && git pull && bash deploy.sh`.
+- The next deploy loads the 3 stores and **deletes the old Kyoto rows** from DynamoDB automatically. The only template change is the Lambda's "missing store" error message.
+- Your `deploy.config` (account ID, repo) isn't touched.
 
 ## Piece G1: Put the starter code in your GitHub repo (P3, IaC + pipeline)
 
@@ -143,7 +153,7 @@ Don't wait for it to be issued. Go on to G3.
    ```
    `CERT_ARN` is still blank, which is fine: this first deploy uses the `https://dxxxx.cloudfront.net` address.
 3. When it prints **Done.**, open the two site links and the API link:
-   - The site should show the Provo store; the store switcher should show Kyoto.
+   - The site should show the Provo store; the store switcher should show Honolulu and Sydney.
    - The API should return JSON with `"count": 6`.
 4. Send Lincoln the whole `Done.` block *(Hand-off G3)*. He needs the **CloudFront** domain for DNS and the **API** URL for local testing.
 
@@ -180,10 +190,10 @@ Save them as PNGs with these exact names and send them all to Lincoln *(Hand-off
 |---|---|---|
 | `fig01.png` | F1 | **S3 → Buckets → pdc-serverless-site-… → Objects.** Show `index.html`, `app.js`, `styles.css`, and the `images/` folder. Also open `images/donuts/` and take a second shot, `fig01b.png`. |
 | `fig02.png` | F2 | **Lambda → Functions → pdc-get-store-items → Code** tab, showing `index.py` |
-| `fig03.png` | F2 | **Test** tab → **Create new event**, name `kyoto`, event JSON below → **Test** → expand **Details** so the 200 response and log output show |
+| `fig03.png` | F2 | **Test** tab → **Create new event**, name `honolulu`, event JSON below → **Test** → expand **Details** so the 200 response and log output show |
 | `fig04.png` | F3 | **API Gateway → APIs → pdc-items-api → Routes → GET** (shows the Lambda integration) |
 | `fig05.png` | F3 | The API URL `…/items?store=provo` opened in Chrome with **Pretty-print** checked |
-| `fig06.png` | F4 | **DynamoDB → Explore items → pdc-store-items.** All 14 rows: 2 PROFILE + 12 ITEM#. Widen the window so `storeId`, `sk`, `name`, `price` show. |
+| `fig06.png` | F4 | **DynamoDB → Explore items → pdc-store-items.** All 21 rows: 3 PROFILE + 18 ITEM#. Widen the window so `storeId`, `sk`, `name`, `price` show. |
 | `fig07.png` | F4 | Lambda **Code** tab, cropped to the `TABLE.query(KeyConditionExpression=Key("storeId").eq(store))` lines |
 | `fig09.png` | F10 | **CloudFront → Distributions → (yours) → General** (alternate domain + certificate) and the **Origins** tab (S3 bucket with OAC). Two shots side by side is fine. |
 | `fig10.png` | F11 | **CloudFormation → Stacks → pdc-serverless → Resources** tab, all `CREATE_COMPLETE` or `UPDATE_COMPLETE` |
@@ -194,7 +204,7 @@ Save them as PNGs with these exact names and send them all to Lincoln *(Hand-off
 
 Test event for `fig03.png`:
 ```json
-{ "queryStringParameters": { "store": "kyoto" } }
+{ "queryStringParameters": { "store": "honolulu" } }
 ```
 (Figures 8, 11, and 13 are Lincoln's.)
 

@@ -10,34 +10,54 @@
       "closeHour": 22,
       "currency": "USD",
       "accent": "#d6336c",
+      "paper": "#fff0f4",
+      "paperDeep": "#ffe0ea",
       "tagline": "Mountain mornings start with something glazed.",
-      "blurb": "Our original shop at the foot of the Wasatch. Classic American donuts, made from scratch every morning.",
-      "bannerImage": "stores/provo.png"
+      "blurb": "Our original shop at the foot of the Wasatch. Cozy classics, deep chocolate, and maple, made from scratch every morning.",
+      "bannerImage": "stores/provo.jpg"
     },
     {
-      "storeId": "kyoto",
-      "name": "Kyoto",
-      "city": "Kyoto, Japan",
-      "address": "Higashiyama-ku, Kyoto 605-0073, Japan",
-      "timezone": "Asia/Tokyo",
-      "openHour": 7,
+      "storeId": "honolulu",
+      "name": "Honolulu",
+      "city": "Honolulu, Hawaii",
+      "address": "Kalākaua Avenue, Waikīkī, HI 96815",
+      "timezone": "Pacific/Honolulu",
+      "openHour": 6,
       "closeHour": 21,
-      "currency": "JPY",
-      "accent": "#5f8a3a",
-      "tagline": "Tea-house flavors, freshly fried.",
-      "blurb": "A few steps from Yasaka Shrine. Light donuts glazed with matcha, hojicha, sakura, and yuzu.",
-      "bannerImage": "stores/kyoto.png"
+      "currency": "USD",
+      "accent": "#0e7c7b",
+      "paper": "#ecf8f5",
+      "paperDeep": "#d4efe9",
+      "tagline": "Island fruit, fried fresh, two blocks from the beach.",
+      "blurb": "Mango, pineapple, passion fruit, and coconut from local farms, glazed the morning they're picked.",
+      "bannerImage": "stores/honolulu.jpg"
+    },
+    {
+      "storeId": "sydney",
+      "name": "Sydney",
+      "city": "Sydney, Australia",
+      "address": "Campbell Parade, Bondi Beach, NSW 2026",
+      "timezone": "Australia/Sydney",
+      "openHour": 6,
+      "closeHour": 20,
+      "currency": "AUD",
+      "accent": "#2457c5",
+      "paper": "#eef3fc",
+      "paperDeep": "#dce6f8",
+      "tagline": "Bondi mornings, berry glaze, and a flat white.",
+      "blurb": "Our beachside shop pairs Aussie café favorites like banana bread and passionfruit with our signature glaze.",
+      "bannerImage": "stores/sydney.jpg"
     }
   ],
   "items": [
     {
       "storeId": "provo",
-      "itemId": "glazed",
-      "name": "Original Glazed",
-      "price": 1.49,
-      "category": "Classic",
-      "calories": 240,
-      "description": "Light, airy yeast donut dipped in a thin vanilla glaze while it's still warm.",
+      "itemId": "paradise-glazed",
+      "name": "Paradise Glazed",
+      "price": 1.89,
+      "category": "Signature",
+      "calories": 260,
+      "description": "Our signature: vanilla-lime glaze with toasted coconut ribbons and fresh lime zest.",
       "tags": [
         "Best seller"
       ],
@@ -45,25 +65,25 @@
         "Wheat",
         "Milk",
         "Egg",
-        "Soy"
+        "Soy",
+        "Coconut"
       ],
       "pairsWith": "Hot cocoa",
       "featured": false,
       "sortOrder": 1,
-      "accent": "#fbe3c4",
-      "image": "donuts/glazed.png"
+      "accent": "#f6ead6",
+      "image": "donuts/paradise-glazed.png"
     },
     {
       "storeId": "provo",
-      "itemId": "beehive-honey",
-      "name": "Beehive Honey",
-      "price": 2.29,
-      "category": "Local favorite",
-      "calories": 280,
-      "description": "Utah wildflower honey glaze with a honeycomb pattern. A nod to the Beehive State.",
+      "itemId": "maple-sunset",
+      "name": "Maple Sunset",
+      "price": 2.49,
+      "category": "Glazed",
+      "calories": 300,
+      "description": "Amber maple glaze with a candied orange-peel twist and a scatter of edible flower petals.",
       "tags": [
-        "Store exclusive",
-        "Best seller"
+        "Store exclusive"
       ],
       "allergens": [
         "Wheat",
@@ -74,84 +94,17 @@
       "pairsWith": "Cold brew",
       "featured": true,
       "sortOrder": 2,
-      "accent": "#fde8a6",
-      "image": "donuts/beehive-honey.png"
+      "accent": "#f8dcc4",
+      "image": "donuts/maple-sunset.png"
     },
     {
       "storeId": "provo",
-      "itemId": "maple-bar",
-      "name": "Maple Bar",
-      "price": 2.29,
-      "category": "Iced",
-      "calories": 330,
-      "description": "A pillowy long john topped with thick real-maple icing.",
-      "tags": [
-        "Store exclusive"
-      ],
-      "allergens": [
-        "Wheat",
-        "Milk",
-        "Egg",
-        "Soy"
-      ],
-      "pairsWith": "Hot chocolate",
-      "featured": false,
-      "sortOrder": 3,
-      "accent": "#f3d2b1",
-      "image": "donuts/maple-bar.png"
-    },
-    {
-      "storeId": "provo",
-      "itemId": "boston-cream",
-      "name": "Boston Cream",
-      "price": 2.49,
-      "category": "Filled",
-      "calories": 310,
-      "description": "Vanilla bean custard filling under a glossy dark-chocolate top.",
-      "tags": [],
-      "allergens": [
-        "Wheat",
-        "Milk",
-        "Egg",
-        "Soy"
-      ],
-      "pairsWith": "Whole milk",
-      "featured": false,
-      "sortOrder": 4,
-      "accent": "#ead7c8",
-      "image": "donuts/boston-cream.png"
-    },
-    {
-      "storeId": "provo",
-      "itemId": "raspberry-filled",
-      "name": "Raspberry Filled",
-      "price": 2.29,
-      "category": "Filled",
-      "calories": 290,
-      "description": "Powdered-sugar shell packed with bright raspberry jam.",
-      "tags": [
-        "Seasonal"
-      ],
-      "allergens": [
-        "Wheat",
-        "Milk",
-        "Egg",
-        "Soy"
-      ],
-      "pairsWith": "Lemonade",
-      "featured": false,
-      "sortOrder": 5,
-      "accent": "#f9d3de",
-      "image": "donuts/raspberry-filled.png"
-    },
-    {
-      "storeId": "provo",
-      "itemId": "rainbow-sprinkle",
-      "name": "Rainbow Sprinkle",
+      "itemId": "chocolate-sprinkle",
+      "name": "Chocolate Sprinkle",
       "price": 1.99,
-      "category": "Iced",
-      "calories": 270,
-      "description": "Chocolate icing covered in rainbow sprinkles. Built for birthdays and Saturdays.",
+      "category": "Classic",
+      "calories": 280,
+      "description": "A fluffy yeast ring dipped in milk-chocolate icing and covered in rainbow sprinkles.",
       "tags": [
         "Kids' pick"
       ],
@@ -163,20 +116,42 @@
       ],
       "pairsWith": "Chocolate milk",
       "featured": false,
-      "sortOrder": 6,
-      "accent": "#d9ecf7",
-      "image": "donuts/rainbow-sprinkle.png"
+      "sortOrder": 3,
+      "accent": "#dbeaf5",
+      "image": "donuts/chocolate-sprinkle.png"
     },
     {
-      "storeId": "kyoto",
-      "itemId": "glazed",
-      "name": "Original Glazed",
-      "price": 210,
-      "category": "Classic",
-      "calories": 240,
-      "description": "Light, airy yeast donut dipped in a thin vanilla glaze while it's still warm.",
+      "storeId": "provo",
+      "itemId": "banana-bread",
+      "name": "Banana Bread",
+      "price": 2.69,
+      "category": "Cake",
+      "calories": 340,
+      "description": "A spiced banana cake donut with brown-butter glaze, candied walnuts, and banana chips.",
+      "tags": [],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy",
+        "Tree nuts"
+      ],
+      "pairsWith": "Drip coffee",
+      "featured": false,
+      "sortOrder": 4,
+      "accent": "#f1e2c8",
+      "image": "donuts/banana-bread.png"
+    },
+    {
+      "storeId": "provo",
+      "itemId": "midnight-cocoa",
+      "name": "Midnight Cocoa",
+      "price": 2.89,
+      "category": "Chocolate",
+      "calories": 360,
+      "description": "Dark chocolate cake donut with a mirror-glaze top, a ganache swirl, and crunchy cocoa nibs.",
       "tags": [
-        "Best seller"
+        "Store exclusive"
       ],
       "allergens": [
         "Wheat",
@@ -184,20 +159,20 @@
         "Egg",
         "Soy"
       ],
-      "pairsWith": "Hot genmaicha",
+      "pairsWith": "Whole milk",
       "featured": false,
-      "sortOrder": 1,
-      "accent": "#fbe3c4",
-      "image": "donuts/glazed.png"
+      "sortOrder": 5,
+      "accent": "#e6dcd6",
+      "image": "donuts/midnight-cocoa.png"
     },
     {
-      "storeId": "kyoto",
-      "itemId": "uji-matcha",
-      "name": "Uji Matcha",
-      "price": 320,
-      "category": "Tea house",
-      "calories": 260,
-      "description": "Stone-ground Uji matcha glaze with a white-chocolate drizzle.",
+      "storeId": "provo",
+      "itemId": "volcano-chocolate",
+      "name": "Volcano Chocolate",
+      "price": 3.29,
+      "category": "Chocolate",
+      "calories": 390,
+      "description": "A molten fudge peak over a chocolate cake donut, topped with dark chocolate chunks and cocoa dust.",
       "tags": [
         "Store exclusive",
         "Best seller"
@@ -208,69 +183,69 @@
         "Egg",
         "Soy"
       ],
-      "pairsWith": "Iced sencha",
-      "featured": true,
-      "sortOrder": 2,
-      "accent": "#dcebc8",
-      "image": "donuts/uji-matcha.png"
-    },
-    {
-      "storeId": "kyoto",
-      "itemId": "hojicha-cream",
-      "name": "Hojicha Cream",
-      "price": 340,
-      "category": "Filled",
-      "calories": 300,
-      "description": "Roasted green tea cream filling under a toasty hojicha glaze.",
-      "tags": [
-        "Store exclusive"
-      ],
-      "allergens": [
-        "Wheat",
-        "Milk",
-        "Egg",
-        "Soy"
-      ],
-      "pairsWith": "Hojicha latte",
+      "pairsWith": "Cold milk",
       "featured": false,
-      "sortOrder": 3,
-      "accent": "#ecd9c4",
-      "image": "donuts/hojicha-cream.png"
+      "sortOrder": 6,
+      "accent": "#ead9cf",
+      "image": "donuts/volcano-chocolate.png"
     },
     {
-      "storeId": "kyoto",
-      "itemId": "black-sesame",
-      "name": "Black Sesame",
-      "price": 300,
-      "category": "Tea house",
-      "calories": 270,
-      "description": "Toasted black sesame icing finished with crunchy white sesame seeds.",
+      "storeId": "honolulu",
+      "itemId": "paradise-glazed",
+      "name": "Paradise Glazed",
+      "price": 2.29,
+      "category": "Signature",
+      "calories": 260,
+      "description": "Our signature: vanilla-lime glaze with toasted coconut ribbons and fresh lime zest.",
       "tags": [
-        "Store exclusive"
+        "Best seller"
       ],
       "allergens": [
         "Wheat",
         "Milk",
         "Egg",
         "Soy",
-        "Sesame"
+        "Coconut"
       ],
-      "pairsWith": "Hot genmaicha",
+      "pairsWith": "Kona coffee",
       "featured": false,
-      "sortOrder": 4,
-      "accent": "#e3e1dc",
-      "image": "donuts/black-sesame.png"
+      "sortOrder": 1,
+      "accent": "#f6ead6",
+      "image": "donuts/paradise-glazed.png"
     },
     {
-      "storeId": "kyoto",
-      "itemId": "sakura",
-      "name": "Sakura",
-      "price": 330,
-      "category": "Seasonal",
-      "calories": 250,
-      "description": "Cherry-blossom glaze topped with candied petals. Spring all year.",
+      "storeId": "honolulu",
+      "itemId": "pineapple-upside-down",
+      "name": "Pineapple Upside-Down",
+      "price": 3.49,
+      "category": "Cake",
+      "calories": 330,
+      "description": "Brown-sugar cake donut crowned with caramelized pineapple and a cherry in the center.",
       "tags": [
-        "Seasonal",
+        "Store exclusive",
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Iced Kona latte",
+      "featured": true,
+      "sortOrder": 2,
+      "accent": "#fbe6bf",
+      "image": "donuts/pineapple-upside-down.png"
+    },
+    {
+      "storeId": "honolulu",
+      "itemId": "mango-sunrise",
+      "name": "Mango Sunrise",
+      "price": 3.29,
+      "category": "Filled",
+      "calories": 310,
+      "description": "Packed with mango curd under a glossy mango glaze and bright citrus zest.",
+      "tags": [
         "Store exclusive"
       ],
       "allergens": [
@@ -279,22 +254,159 @@
         "Egg",
         "Soy"
       ],
-      "pairsWith": "Sakura tea",
+      "pairsWith": "Passion-orange-guava juice",
       "featured": false,
-      "sortOrder": 5,
-      "accent": "#fbdce5",
-      "image": "donuts/sakura.png"
+      "sortOrder": 3,
+      "accent": "#fde3b5",
+      "image": "donuts/mango-sunrise.png"
     },
     {
-      "storeId": "kyoto",
-      "itemId": "yuzu-citrus",
-      "name": "Yuzu Citrus",
-      "price": 310,
-      "category": "Seasonal",
-      "calories": 250,
-      "description": "Bright yuzu glaze with candied zest. Tart, sweet, and fresh.",
+      "storeId": "honolulu",
+      "itemId": "passionfruit-cream",
+      "name": "Passionfruit Cream",
+      "price": 3.29,
+      "category": "Filled",
+      "calories": 320,
+      "description": "Passionfruit glaze with crunchy seeds over a silky passionfruit-vanilla cream filling.",
+      "tags": [],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Iced tea",
+      "featured": false,
+      "sortOrder": 4,
+      "accent": "#faecb8",
+      "image": "donuts/passionfruit-cream.png"
+    },
+    {
+      "storeId": "honolulu",
+      "itemId": "toasted-coconut",
+      "name": "Toasted Coconut",
+      "price": 2.99,
+      "category": "Cake",
+      "calories": 320,
+      "description": "A crisp-edged cake donut in vanilla glaze, buried under golden toasted coconut.",
+      "tags": [],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy",
+        "Coconut"
+      ],
+      "pairsWith": "Coconut cold brew",
+      "featured": false,
+      "sortOrder": 5,
+      "accent": "#efe3d2",
+      "image": "donuts/toasted-coconut.png"
+    },
+    {
+      "storeId": "honolulu",
+      "itemId": "honey-hibiscus",
+      "name": "Honey Hibiscus",
+      "price": 3.19,
+      "category": "Glazed",
+      "calories": 280,
+      "description": "Wildflower honey and hibiscus glaze, finished with dried hibiscus petals.",
       "tags": [
-        "Store exclusive"
+        "Store exclusive",
+        "Seasonal"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Hibiscus iced tea",
+      "featured": false,
+      "sortOrder": 6,
+      "accent": "#fadbe2",
+      "image": "donuts/honey-hibiscus.png"
+    },
+    {
+      "storeId": "sydney",
+      "itemId": "paradise-glazed",
+      "name": "Paradise Glazed",
+      "price": 4.2,
+      "category": "Signature",
+      "calories": 260,
+      "description": "Our signature: vanilla-lime glaze with toasted coconut ribbons and fresh lime zest.",
+      "tags": [
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy",
+        "Coconut"
+      ],
+      "pairsWith": "Flat white",
+      "featured": false,
+      "sortOrder": 1,
+      "accent": "#f6ead6",
+      "image": "donuts/paradise-glazed.png"
+    },
+    {
+      "storeId": "sydney",
+      "itemId": "strawberry-lagoon",
+      "name": "Strawberry Lagoon",
+      "price": 5.9,
+      "category": "Filled",
+      "calories": 300,
+      "description": "Strawberry glaze and freeze-dried berries over a strawberries-and-cream filling.",
+      "tags": [
+        "Store exclusive",
+        "Best seller"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Iced latte",
+      "featured": true,
+      "sortOrder": 2,
+      "accent": "#fcd8dd",
+      "image": "donuts/strawberry-lagoon.png"
+    },
+    {
+      "storeId": "sydney",
+      "itemId": "banana-bread",
+      "name": "Banana Bread",
+      "price": 5.5,
+      "category": "Cake",
+      "calories": 340,
+      "description": "A spiced banana cake donut with brown-butter glaze, candied walnuts, and banana chips.",
+      "tags": [],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy",
+        "Tree nuts"
+      ],
+      "pairsWith": "Flat white",
+      "featured": false,
+      "sortOrder": 3,
+      "accent": "#f1e2c8",
+      "image": "donuts/banana-bread.png"
+    },
+    {
+      "storeId": "sydney",
+      "itemId": "passionfruit-cream",
+      "name": "Passionfruit Cream",
+      "price": 5.9,
+      "category": "Filled",
+      "calories": 320,
+      "description": "Passionfruit glaze with crunchy seeds over a silky passionfruit-vanilla cream filling.",
+      "tags": [
+        "Seasonal"
       ],
       "allergens": [
         "Wheat",
@@ -304,9 +416,54 @@
       ],
       "pairsWith": "Sparkling water",
       "featured": false,
+      "sortOrder": 4,
+      "accent": "#faecb8",
+      "image": "donuts/passionfruit-cream.png"
+    },
+    {
+      "storeId": "sydney",
+      "itemId": "toasted-coconut",
+      "name": "Toasted Coconut",
+      "price": 5.2,
+      "category": "Cake",
+      "calories": 320,
+      "description": "A crisp-edged cake donut in vanilla glaze, buried under golden toasted coconut.",
+      "tags": [],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy",
+        "Coconut"
+      ],
+      "pairsWith": "Long black",
+      "featured": false,
+      "sortOrder": 5,
+      "accent": "#efe3d2",
+      "image": "donuts/toasted-coconut.png"
+    },
+    {
+      "storeId": "sydney",
+      "itemId": "chocolate-sprinkle",
+      "name": "Chocolate Sprinkle",
+      "price": 4.5,
+      "category": "Classic",
+      "calories": 280,
+      "description": "A fluffy yeast ring dipped in milk-chocolate icing and covered in rainbow sprinkles.",
+      "tags": [
+        "Kids' pick"
+      ],
+      "allergens": [
+        "Wheat",
+        "Milk",
+        "Egg",
+        "Soy"
+      ],
+      "pairsWith": "Babycino",
+      "featured": false,
       "sortOrder": 6,
-      "accent": "#fbf0b8",
-      "image": "donuts/yuzu-citrus.png"
+      "accent": "#dbeaf5",
+      "image": "donuts/chocolate-sprinkle.png"
     }
   ]
 }

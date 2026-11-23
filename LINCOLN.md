@@ -16,7 +16,7 @@ How to help:
 
 ## Lincoln's job in one paragraph
 
-- Make the final donut and store images in ChatGPT.
+- Make the 3 store banners in ChatGPT (the 12 donut photos are already done).
 - Add the two DNS records that put the site at `donuts.lincolnlyons.com`.
 - Test the website with Gabe's API.
 - Get the GitHub Actions pipeline to a green run.
@@ -53,10 +53,11 @@ Everything is already written in this repo: `template.yaml` (all infrastructure,
 
 - **AWS account:** Gabe's, region **us-east-1**. **Repo:** Gabe's GitHub, `pdc-serverless`, with Lincoln (`linklyns`) as a collaborator. The deploy role only trusts pushes to **main** of the repo named in `deploy.config`.
 - **Resource names** (the diagram must match): stack `pdc-serverless`, bucket `pdc-serverless-site-<accountId>`, CloudFront distribution in front of the bucket, table `pdc-store-items`, Lambda `pdc-get-store-items` (role `pdc-get-store-items-role`), HTTP API `pdc-items-api` with route `GET /items`, alarm `pdc-get-store-items-errors`, SNS topic `pdc-alerts`, pipeline role `pdc-github-deploy-role`.
-- **DynamoDB keys (single-table design):** partition key `storeId` (`provo`, `kyoto`) and sort key `sk`. Each store has one `PROFILE` row (name, address, hours, currency, banner) and 6 `ITEM#<itemId>` rows. Original Glazed is stored once per store (P3 requirement).
-- **API response** (`GET /items?store=kyoto`): `{ store, profile, count, items[] }`. Item fields: `itemId, name, price, category, calories, description, tags[], allergens[], pairsWith, featured, sortOrder, accent, imageUrl`. The website depends on these names.
-- **Images:** `site/images/donuts/<itemId>.png` (11 files) and `site/images/stores/<storeId>.png` (2 files). Filenames must match `data/items.json`. The repo ships with placeholder PNGs, so the site works before the final images exist.
+- **DynamoDB keys (single-table design):** partition key `storeId` (`provo`, `honolulu`, `sydney`) and sort key `sk`. Each store has one `PROFILE` row (name, address, hours, time zone, currency, theme colors, banner) and 6 `ITEM#<itemId>` rows, for 21 rows total. Paradise Glazed is stored once for each of the 3 stores, and four other donuts are sold at 2 stores each (P3 requirement).
+- **API response** (`GET /items?store=honolulu`): `{ store, profile, count, items[] }`. Item fields: `itemId, name, price, category, calories, description, tags[], allergens[], pairsWith, featured, sortOrder, accent, imageUrl`. The website depends on these names.
+- **Images:** `site/images/donuts/<itemId>.png` (12 final photos with transparent backgrounds) and `site/images/stores/<storeId>.png` (3 banners; placeholders until Lincoln replaces them). Filenames must match `data/items.json`.
 - **Live URL:** `https://donuts.lincolnlyons.com/?store=provo`. Until the domain is live, use the CloudFront URL that `deploy.sh` prints.
+- **Menu changes:** edit `data/items.json`. Every deploy loads it into DynamoDB and deletes rows that are no longer in the file, so removed stores or donuts disappear cleanly.
 - **Deploying:** the first deploy runs from CloudShell (`bash deploy.sh`). After the pipeline works, deploy by pushing to `main`. Don't run CloudShell deploys and pipeline deploys at the same time.
 - **Production changes = priced items.** Everything on the Feature 6 list must also appear in the Feature 7 estimate (P5).
 
@@ -65,6 +66,7 @@ Everything is already written in this repo: `template.yaml` (all infrastructure,
 | When | From → To | What |
 |---|---|---|
 | G1 | Gabe → Lincoln | GitHub collaborator invite and the repo URL |
+| Now | Lincoln → Gabe | Pull request `honolulu-sydney-menu` (3 stores + final donut photos) to merge |
 | G2 | Gabe → Lincoln | The certificate validation CNAME (name + value) |
 | G3 | Gabe → Lincoln | The `Done.` block from `deploy.sh` (CloudFront domain, API URL, site URL) |
 | L2 | Lincoln → Gabe | "Both DNS records are in" |
@@ -86,63 +88,48 @@ P1 intro · P2–3 requirements · P3 optional features · P4 rubric + deliverab
 
 ---
 
-## Piece L1: Donut and store images in ChatGPT (Feature 9, P3–P4)
+## Piece L1: Store banners in ChatGPT (Feature 9, P3–P4)
 
-Start now; it doesn't depend on Gabe. You need **13 images**: 11 donuts and 2 store banners. The repo ships with placeholder PNGs at the same paths, so the site works until you replace them.
+**The donuts are done.** Your 12 photos are already in the repo with the white backgrounds removed, at `site/images/donuts/<itemId>.png`. You only need **3 store banners**. The repo has simple placeholder banners at the same paths, so the site works until you replace them.
 
-**Message 1: paste this exactly to lock the style:**
+**Message 1: paste this exactly to set the style:**
 ```text
-I'm making product illustrations for a donut shop website. I'll ask for one image per message. Every image in this conversation must use this exact style so they match as a set:
+I need three wide banner images for a donut shop website, one per message. Every banner must use this exact style so they match as a set:
 
-- Square 1024x1024 PNG with a truly transparent background (real alpha channel, not a checkerboard pattern and not white).
-- One single donut, centered, seen from about 35 degrees above, filling about 80% of the frame.
-- Soft, glossy 3D illustration style, like a clean clay-like product render. Slightly stylized, not photorealistic.
-- Warm, soft studio lighting from the upper left. One small, soft contact shadow directly under the donut.
-- The fried dough is the same warm golden brown in every image.
-- No plate, no table, no props, no hands, no text, no border, no background scenery.
+- Landscape 1536x1024 PNG with a full background.
+- Bright, warm, photorealistic, like a professional travel and food photo. Golden morning light, shallow depth of field.
+- A small, inviting independent donut shop is the subject, seen from across the street at eye level.
+- No people, no cars in front of the shop, and no readable text, logos, or brand names anywhere.
+- Keep the lower-left quarter of the image fairly calm and uncluttered, because the website places a small card there.
 
-Reply "Ready" and wait for the first donut.
+Reply "Ready" and wait for the first location.
 ```
 
-**Messages 2–12: one at a time.** Save each image with the filename shown:
+**Messages 2–4: one at a time.** Download each image and rename it to the filename in the heading:
 
-| Save as | Message to send |
-|---|---|
-| `glazed.png` | Original Glazed: a classic ring yeast donut with a thin, translucent, shiny vanilla glaze and a few soft glaze drips at the edges. |
-| `beehive-honey.png` | Beehive Honey: a ring donut with a golden honey glaze and a subtle raised honeycomb (hexagon) pattern in the glaze, plus a tiny drizzle of honey. |
-| `maple-bar.png` | Maple Bar: a long rectangular "long john" donut with rounded ends, topped with thick, glossy, amber real-maple icing. Same camera angle; the bar runs diagonally. |
-| `boston-cream.png` | Boston Cream: a round filled donut with no hole, a glossy dark-chocolate top, and a little vanilla custard peeking out of one side. |
-| `raspberry-filled.png` | Raspberry Filled: a round filled donut with no hole, dusted with powdered sugar, with bright red raspberry jam oozing slightly from a small opening on the side. |
-| `rainbow-sprinkle.png` | Rainbow Sprinkle: a ring donut with chocolate icing covered in colorful rainbow sprinkles (pink, yellow, teal, blue, white). |
-| `uji-matcha.png` | Uji Matcha: a ring donut with a vivid green matcha glaze and thin zig-zag drizzles of white chocolate. |
-| `hojicha-cream.png` | Hojicha Cream: a round filled donut with no hole, a toasty light-brown roasted-tea glaze, and a cream-colored drizzle. |
-| `black-sesame.png` | Black Sesame: a ring donut with a charcoal-gray black-sesame icing, sprinkled with small white sesame seeds. |
-| `sakura.png` | Sakura: a ring donut with a soft pale-pink cherry-blossom glaze topped with a few small candied pink-and-white sakura petals. |
-| `yuzu-citrus.png` | Yuzu Citrus: a ring donut with a bright sunny-yellow yuzu glaze and small flecks of candied orange-yellow zest. |
-
-**Messages 13–14: banners.** Send this first, then each banner:
+**`provo.png`**
 ```text
-Now two wide store banners. Same soft 3D illustration style and lighting, but these are landscape 1536x1024 PNGs with a full background (not transparent). No people, no readable text or logos on any sign. Keep the lower-left corner fairly calm because the website places a small card there.
+Banner 1 of 3: Provo, Utah. The shop has a strawberry-pink awning and big front windows. Behind it, the Wasatch mountains at sunrise with a large white block-letter "Y" on the mountainside (the only lettering allowed). Pastel pink-and-peach sky, a few pine trees.
 ```
-| Save as | Message to send |
-|---|---|
-| `provo.png` | Provo, Utah: a cozy small donut shop with a strawberry-pink awning at sunrise. Behind it, the Wasatch mountains with a large white block-letter "Y" on the mountainside. A pastel pink-and-peach sky and a few pine trees. |
-| `kyoto.png` | Kyoto, Japan: a small traditional wooden machiya-style donut shop with a matcha-green noren curtain and red paper lanterns. A five-story pagoda in the background, cherry-blossom trees, and soft morning light. |
+**`honolulu.png`**
+```text
+Banner 2 of 3: Honolulu, Hawaii. The shop has a teal awning and an open-air counter, with palm trees and plumeria around it. Behind it, the turquoise ocean of Waikiki and the green slopes of Diamond Head under a clear morning sky.
+```
+**`sydney.png`**
+```text
+Banner 3 of 3: Sydney, Australia. A beachside shop with a blue-and-white striped awning on the promenade above Bondi Beach. Golden sand, rolling surf, and the curve of the bay behind it in soft early-morning light.
+```
 
 **If something's off:**
-- If the background isn't transparent, reply: *"Make the background actually transparent (alpha), not a checkerboard."* Or use **Preview → Tools → Remove Background** on the Mac.
-- If an image drifts from the style, reply *"Same style as the first image, please"* and regenerate.
+- If ChatGPT adds text or logos, reply `Regenerate with no text or lettering anywhere` (for Provo, add: `except the Y on the mountain`).
+- If a file downloads as `.webp`, convert it with `sips -s format png name.webp --out name.png`.
 
-**Shrink the images and put them in place** (from the repo folder on your Mac):
+**Put them in place** (from the repo folder on your Mac, after L3):
 ```bash
-mv ~/Downloads/{glazed,beehive-honey,maple-bar,boston-cream,raspberry-filled,rainbow-sprinkle,uji-matcha,hojicha-cream,black-sesame,sakura,yuzu-citrus}.png site/images/donuts/
-mv ~/Downloads/{provo,kyoto}.png site/images/stores/
-sips -Z 640 site/images/donuts/*.png
+mv ~/Downloads/{provo,honolulu,sydney}.png site/images/stores/
 sips -Z 1600 site/images/stores/*.png
 ```
-- Why: smaller files load faster on the site.
-- If ChatGPT saved a file as `.webp`, convert it first: `sips -s format png file.webp --out file.png`.
-- Commit and push once you have the repo (L3). The pipeline deploys the images.
+Why: `sips` shrinks the 1–2 MB ChatGPT files so the page loads fast. You'll push these in L4.
 
 ## Piece L2: DNS records for donuts.lincolnlyons.com (Feature 14, P3)
 
@@ -173,7 +160,7 @@ The site is finished: `site/index.html`, `site/styles.css`, `site/app.js`.
 2. Put Gabe's API URL in `site/config.js` (the `ApiEndpoint` value, no trailing slash). Open `site/index.html` with **Live Server**.
    - Don't commit this local change: `git checkout site/config.js` before you push. Even if you do commit it, `deploy.sh` overwrites the file on every deploy, so nothing breaks.
 3. What the page does, so you can describe it in the doc:
-   - **Store switcher (Provo / Kyoto):** updates `?store=`, re-runs the DynamoDB Query, and switches the color theme and currency (USD / JPY).
+   - **Store switcher (Provo / Honolulu / Sydney):** updates `?store=`, re-runs the DynamoDB Query, and switches the color theme (stored in each store's `PROFILE` row) and the currency (USD / AUD).
    - **Store hero:** the store name as large type, an open/closed status calculated from the store's own time zone, the address and hours (from the `PROFILE` row), the banner, and "Today's pick" (the featured item).
    - **Menu:** search, category chips, sorting (our order, price, calories), loading placeholders, and a clear empty-search state with a reset button.
    - **Donut details:** a dialog with calories, pairing, allergens, and a quantity stepper.
@@ -187,13 +174,13 @@ The site is finished: `site/index.html`, `site/styles.css`, `site/app.js`.
 The workflow is `.github/workflows/deploy.yml`. It has three jobs:
 1. **Validate**: CloudFormation lint, a data check, and a JS syntax check.
 2. **Deploy to AWS**: signs in with GitHub OIDC (no stored keys) and runs `deploy.sh`.
-3. **Smoke test**: checks that each store's API returns 6 items and that the site loads.
+3. **Smoke test**: checks that all three stores' APIs return 6 items each and that the site loads.
 
 Steps:
 1. Wait until Gabe's first CloudShell deploy is done (G3); it creates the role the pipeline uses.
-2. Push your images (L1):
+2. Push your banners (L1):
    ```bash
-   git add site/images && git commit -m "Final donut and store illustrations" && git push
+   git add site/images/stores && git commit -m "Store banners" && git push
    ```
 3. On GitHub, open **Actions → Deploy PDC** and watch the run. To re-run without a commit: **Run workflow**.
 4. 📸 **`fig11.png`**: the run summary with all three jobs green (F12).
@@ -209,9 +196,9 @@ Use **draw.io** (app.diagrams.net) with the AWS icon set (**+ More shapes → AW
 
 - **Request path**, as numbered arrows (it's a real sequence):
   1. Browser → **CloudFront** (`donuts.lincolnlyons.com`, ACM certificate) → **S3** (private bucket, OAC): HTML, CSS, JS, images
-  2. Browser → **API Gateway HTTP API** `GET /items?store=kyoto`
+  2. Browser → **API Gateway HTTP API** `GET /items?store=honolulu`
   3. API Gateway → **Lambda** `pdc-get-store-items` (Python 3.13, IAM role allows only Query)
-  4. Lambda → **DynamoDB** `pdc-store-items`: Query on `storeId = kyoto`
+  4. Lambda → **DynamoDB** `pdc-store-items`: Query on `storeId = honolulu`
   5. JSON back to the browser
 - **Supporting pieces** (smaller, off to the side):
   - **CloudWatch Logs** (Lambda + API access logs), the **CloudWatch alarm → SNS** `pdc-alerts`, and DynamoDB **PITR**

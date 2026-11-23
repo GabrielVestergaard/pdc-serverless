@@ -195,7 +195,7 @@ Resources:
               params = event.get("queryStringParameters") or {}
               store = (params.get("store") or "").strip().lower()
               if not store:
-                  return respond(400, {"error": "Add ?store=provo or ?store=kyoto"})
+                  return respond(400, {"error": "Add ?store=provo, ?store=honolulu, or ?store=sydney"})
 
               try:
                   # One Query reads the whole store partition: its PROFILE row and every ITEM# row

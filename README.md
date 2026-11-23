@@ -1,6 +1,6 @@
 # Paradise Donut Co.: serverless prototype
 
-A two-store donut menu (Provo and Kyoto) served from S3 + CloudFront, with the menu loaded live through API Gateway, a Python Lambda, and DynamoDB. Built for the BYU IS AWS Serverless Project.
+A three-store donut menu (Provo, Honolulu, and Sydney) served from S3 + CloudFront, with the menu loaded live through API Gateway, a Python Lambda, and DynamoDB. Built for the BYU IS AWS Serverless Project.
 
 - Live: https://donuts.lincolnlyons.com/?store=provo
 - `template.yaml`: all infrastructure as CloudFormation (the Lambda code is inline)

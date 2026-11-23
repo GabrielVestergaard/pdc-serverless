@@ -4,8 +4,9 @@
 
   const API_BASE = (window.PDC_CONFIG && window.PDC_CONFIG.apiBase || "").replace(/\/$/, "");
   const STORES = [
-    { id: "provo", label: "Provo", flag: "🇺🇸" },
-    { id: "kyoto", label: "Kyoto", flag: "🇯🇵" },
+    { id: "provo", label: "Provo", icon: "🏔️" },
+    { id: "honolulu", label: "Honolulu", icon: "🌺" },
+    { id: "sydney", label: "Sydney", icon: "🌊" },
   ];
   const BOX_SIZE = 12;
   const DOZEN_DISCOUNT = 0.1;
@@ -17,7 +18,7 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const money = (n) => {
     const currency = (state.profile && state.profile.currency) || "USD";
-    return new Intl.NumberFormat(currency === "JPY" ? "ja-JP" : "en-US", { style: "currency", currency }).format(n);
+    return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(n);
   };
   const storage = {
     get(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } },
@@ -39,7 +40,7 @@
   // ---------- store switch ----------
   function renderStoreSwitch() {
     $("store-switch").innerHTML = STORES.map((s) =>
-      `<button type="button" data-store="${s.id}" aria-pressed="${s.id === state.store}"><span class="flag" aria-hidden="true">${s.flag}</span>${esc(s.label)}</button>`
+      `<button type="button" data-store="${s.id}" aria-pressed="${s.id === state.store}"><span class="flag" aria-hidden="true">${s.icon}</span>${esc(s.label)}</button>`
     ).join("");
   }
 
@@ -63,8 +64,13 @@
   function renderHero() {
     const p = state.profile;
     document.body.dataset.store = state.store;
+    // each store's colors come from its PROFILE row in DynamoDB
+    if (p.accent) document.body.style.setProperty("--accent", p.accent);
+    if (p.paper) document.body.style.setProperty("--paper", p.paper);
+    if (p.paperDeep) document.body.style.setProperty("--paper-deep", p.paperDeep);
     document.title = `Paradise Donut Co. | ${p.name}`;
     $("store-name").textContent = p.name;
+    $("store-name").classList.toggle("long", p.name.length > 6);
     $("store-tagline").textContent = p.tagline;
     $("store-blurb").textContent = p.blurb;
     $("store-address").textContent = p.address;
