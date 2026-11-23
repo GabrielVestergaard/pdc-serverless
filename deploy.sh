@@ -42,6 +42,12 @@ rm -rf .build && mkdir -p .build
 python3 scripts/build_items.py "$TABLE" "$SITE_URL" .build/ddb | while read -r f; do
   aws dynamodb batch-write-item --request-items "file://$f" --query "length(UnprocessedItems)" --output text >/dev/null
 done
+# remove rows that are no longer in data/items.json (e.g., a store or donut that was taken off the menu)
+aws dynamodb scan --table-name "$TABLE" --projection-expression "storeId, sk" --output json > .build/existing.json
+python3 scripts/stale_items.py "$TABLE" .build/existing.json .build/ddb/keys.json .build/stale | while read -r f; do
+  echo "    removing old rows listed in $f"
+  aws dynamodb batch-write-item --request-items "file://$f" --query "length(UnprocessedItems)" --output text >/dev/null
+done
 
 echo "==> 3/5 Building the website (pointing it at the API)..."
 cp -r site .build/site
@@ -61,7 +67,8 @@ cat <<EOF
 
 Done.
   Site (Provo):   $SITE_URL/?store=provo
-  Site (Kyoto):   $SITE_URL/?store=kyoto
+  Site (Honolulu): $SITE_URL/?store=honolulu
+  Site (Sydney):  $SITE_URL/?store=sydney
   API (Provo):    $API/items?store=provo
   CloudFront:     $CF_DOMAIN   (the CNAME target for $DOMAIN)
   Distribution:   $DIST_ID

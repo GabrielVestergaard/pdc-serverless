@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: API returns 6 items for each store
         run: |
-          for store in provo kyoto; do
+          for store in provo honolulu sydney; do
             count=$(curl -fsS "${{ needs.deploy.outputs.api }}/items?store=$store" | jq '.count')
             echo "$store: $count items"
             test "$count" -ge 6

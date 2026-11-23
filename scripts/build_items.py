@@ -38,6 +38,9 @@ def main():
         rows.append(row)
 
     os.makedirs(out_dir, exist_ok=True)
+    keys = [{"storeId": r["storeId"], "sk": r["sk"]} for r in rows]
+    with open(os.path.join(out_dir, "keys.json"), "w") as f:
+        json.dump(keys, f)
     for i in range(0, len(rows), 25):
         batch = {table: [{"PutRequest": {"Item": {k: to_ddb(v) for k, v in r.items()}}} for r in rows[i:i + 25]]}
         path = os.path.join(out_dir, f"batch-{i // 25 + 1}.json")
